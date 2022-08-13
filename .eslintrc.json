@@ -17,6 +17,7 @@
     "import/extensions": "off",
     "import/no-unresolved": "off",
     "import/prefer-default-export": "off",
+    "no-unused-vars": "warn",
     "react/jsx-filename-extension": [
       1,
       { "extensions": [".js", ".jsx", ".ts", ".tsx"] }
@@ -25,6 +26,7 @@
       2,
       { "namedComponents": ["arrow-function", "function-declaration"] }
     ],
+    "react/jsx-props-no-spreading": "off",
     "react/react-in-jsx-scope": "off"
   }
 }
