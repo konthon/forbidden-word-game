@@ -18,6 +18,7 @@ import {
   TabList,
   Tabs,
   Text,
+  useDisclosure,
   useToast,
 } from '@chakra-ui/react'
 import { isEmpty } from 'lodash'
@@ -36,6 +37,7 @@ import {
 } from 'services/Firebase/authentication'
 
 import GoogleButton from './GoogleButton'
+import ResetPasswordModal from './ResetPasswordModal'
 
 // eslint-disable-next-line no-shadow
 enum EAuthType {
@@ -65,6 +67,13 @@ const AuthModal: FC<IProps> = (props) => {
   const { onClose } = props
   const { data: user } = useAuthState()
   const toast = useToast()
+
+  const {
+    isOpen: isOpenResetPassword,
+    onOpen: onOpenResetPassword,
+    onClose: onCloseResetPassword,
+  } = useDisclosure()
+
   const [authType, setAuthType] = useState(EAuthType.sign_in)
 
   const {
@@ -114,66 +123,83 @@ const AuthModal: FC<IProps> = (props) => {
   }, [user])
 
   return (
-    <Modal {...props}>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>
-          <Tabs index={authType} onChange={(index) => setAuthType(index)}>
-            <TabList>
-              {AUTH_TYPES.map((item) => (
-                <Tab key={item.type}>{item.name}</Tab>
-              ))}
-            </TabList>
-          </Tabs>
-        </ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Stack>
-            <Stack as='form' onSubmit={handleSubmit(onSubmit)}>
-              <FormControl isInvalid={!isEmpty(errors.email)}>
-                <Input
-                  type='email'
-                  autoComplete='email'
-                  placeholder='อีเมล'
-                  {...register('email', { required: 'กรุณากรอกอีเมล' })}
+    <>
+      <Modal {...props}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            <Tabs index={authType} onChange={(index) => setAuthType(index)}>
+              <TabList>
+                {AUTH_TYPES.map((item) => (
+                  <Tab key={item.type}>{item.name}</Tab>
+                ))}
+              </TabList>
+            </Tabs>
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Stack>
+              <Stack as='form' onSubmit={handleSubmit(onSubmit)}>
+                <FormControl isInvalid={!isEmpty(errors.email)}>
+                  <Input
+                    type='email'
+                    autoComplete='email'
+                    placeholder='อีเมล'
+                    {...register('email', { required: 'กรุณากรอกอีเมล' })}
+                  />
+                  <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
+                </FormControl>
+                <FormControl isInvalid={!isEmpty(errors.password)}>
+                  <Input
+                    type='password'
+                    autoComplete='current-password'
+                    placeholder='รหัสผ่าน'
+                    {...register('password', { required: 'กรุณากรอกรหัสผ่าน' })}
+                  />
+                  <FormErrorMessage>
+                    {errors.password?.message}
+                  </FormErrorMessage>
+                </FormControl>
+                <Button
+                  type='submit'
+                  colorScheme='blue'
+                  onClick={handleSubmit(onSubmit)}
+                >
+                  {AUTH_TYPES.find((item) => item.type === authType)?.name}
+                </Button>
+                {authType === EAuthType.sign_in && (
+                  <Button
+                    variant='link'
+                    alignSelf='center'
+                    onClick={onOpenResetPassword}
+                  >
+                    ลืมรหัสผ่าน?
+                  </Button>
+                )}
+              </Stack>
+              <HStack>
+                <Divider />
+                <Text>หรือ</Text>
+                <Divider />
+              </HStack>
+              <HStack justifyContent='center'>
+                <IconButton
+                  icon={<FaFacebook />}
+                  aria-label='Continue with Facebook'
+                  colorScheme='facebook'
+                  isDisabled
                 />
-                <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
-              </FormControl>
-              <FormControl isInvalid={!isEmpty(errors.password)}>
-                <Input
-                  type='password'
-                  autoComplete='current-password'
-                  placeholder='รหัสผ่าน'
-                  {...register('password', { required: 'กรุณากรอกรหัสผ่าน' })}
-                />
-                <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
-              </FormControl>
-              <Button
-                type='submit'
-                colorScheme='blue'
-                onClick={handleSubmit(onSubmit)}
-              >
-                {AUTH_TYPES.find((item) => item.type === authType)?.name}
-              </Button>
+                <GoogleButton />
+              </HStack>
             </Stack>
-            <HStack>
-              <Divider />
-              <Text>หรือ</Text>
-              <Divider />
-            </HStack>
-            <HStack justifyContent='center'>
-              <IconButton
-                icon={<FaFacebook />}
-                aria-label='Continue with Facebook'
-                colorScheme='facebook'
-                isDisabled
-              />
-              <GoogleButton />
-            </HStack>
-          </Stack>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      <ResetPasswordModal
+        isOpen={isOpenResetPassword}
+        onClose={onCloseResetPassword}
+      />
+    </>
   )
 }
 

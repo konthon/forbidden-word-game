@@ -1,5 +1,6 @@
 import {
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut as _signOut,
@@ -19,3 +20,6 @@ export const signOut = () => _signOut(firebaseAuth)
 
 export const signInWithProvider = (provider: AuthProvider) =>
   signInWithPopup(firebaseAuth, provider)
+
+export const sendResetPasswordToEmail = (email: string) =>
+  sendPasswordResetEmail(firebaseAuth, email)
