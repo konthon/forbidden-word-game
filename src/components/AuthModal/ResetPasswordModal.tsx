@@ -15,8 +15,8 @@ import {
   Stack,
   useToast,
 } from '@chakra-ui/react'
-import { useForm } from 'react-hook-form'
 import { isEmpty } from 'lodash'
+import { useForm } from 'react-hook-form'
 
 import type { ModalProps } from '@chakra-ui/react'
 import type { FC } from 'react'
@@ -49,8 +49,8 @@ const ResetPasswordModal: FC<IProps> = (props) => {
         title: 'ส่งอีเมลเรียบร้อยแล้ว',
         description: `กรุณาตรวจสอบอีเมล: ${email}`,
       })
-      reset()
       onClose()
+      reset()
     } catch (error: any) {
       toast({
         status: 'error',

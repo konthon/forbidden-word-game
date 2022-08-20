@@ -56,6 +56,8 @@ const AUTH_TYPES = [
   },
 ]
 
+const MIN_LENGTH_PASSWORD = 6
+
 interface IPasswordAuthFields {
   email: string
   password: string
@@ -152,9 +154,19 @@ const AuthModal: FC<IProps> = (props) => {
                 <FormControl isInvalid={!isEmpty(errors.password)}>
                   <Input
                     type='password'
-                    autoComplete='current-password'
+                    autoComplete={
+                      authType === EAuthType.sign_in
+                        ? 'current-password'
+                        : 'new-password'
+                    }
                     placeholder='รหัสผ่าน'
-                    {...register('password', { required: 'กรุณากรอกรหัสผ่าน' })}
+                    {...register('password', {
+                      required: 'กรุณากรอกรหัสผ่าน',
+                      minLength: {
+                        value: MIN_LENGTH_PASSWORD,
+                        message: `รหัสผ่านคาดเดาง่าย กรุณากรอกมากกว่า ${MIN_LENGTH_PASSWORD} ตัวอักษร`,
+                      },
+                    })}
                   />
                   <FormErrorMessage>
                     {errors.password?.message}
