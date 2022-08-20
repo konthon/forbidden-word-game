@@ -4,13 +4,13 @@ import { getAuth } from 'firebase/auth'
 import { getDatabase } from 'firebase/database'
 
 export const firebaseConfig = {
-  apiKey: 'AIzaSyA9PZmKsXnJg0TPjN1rnYxWpsUzinPNamM',
-  authDomain: 'forbidden-words-game.firebaseapp.com',
-  projectId: 'forbidden-words-game',
-  storageBucket: 'forbidden-words-game.appspot.com',
-  messagingSenderId: '114468987612',
-  appId: '1:114468987612:web:83260f94d52354b8ca8a19',
-  measurementId: 'G-5K4J85EWFZ',
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGE_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 }
 
 export const firebaseApp = initializeApp(firebaseConfig)
