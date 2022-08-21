@@ -7,22 +7,45 @@ import {
   Container,
   useDisclosure,
   Divider,
+  Flex,
+  Tooltip,
 } from '@chakra-ui/react'
-import { AuthModal } from 'components/AuthModal'
-import { useAuthState } from 'hooks/useAuthState'
+import { useMemo } from 'react'
 import { isEmpty } from 'lodash'
+import { FaPen } from 'react-icons/fa'
 
 import type { FC } from 'react'
 
+import { AuthModal } from 'components/AuthModal'
+import { useAuthState } from 'hooks/useAuthState'
 import { signOut } from 'services/Firebase/authentication'
+import { UpdateNameModal } from 'components/UpdateNameModal'
 
 const HomePage: FC = () => {
   const { user, isLoading } = useAuthState()
+
   const {
     isOpen: isOpenAuthModal,
     onOpen: onOpenAuthModal,
     onClose: onCloseAuthModal,
   } = useDisclosure()
+
+  const {
+    isOpen: isOpenUpdateNameModal,
+    onOpen: onOpenUpdateNameModal,
+    onClose: onCloseUpdateNameModal,
+  } = useDisclosure()
+
+  const displayName = useMemo(() => {
+    const MAX_LENGTH_NAME = 20
+    if (user && !isEmpty(user)) {
+      const result = user.displayName || user.email || user.uid
+      const ellipsis = result.length > MAX_LENGTH_NAME ? '...' : ''
+      return `${result.slice(0, MAX_LENGTH_NAME)}${ellipsis}`
+    }
+    return 'User'
+  }, [user, user?.displayName, user?.email, user?.uid])
+
   return (
     <>
       <Container>
@@ -43,10 +66,23 @@ const HomePage: FC = () => {
             )}
             {!isEmpty(user) && !isLoading && (
               <>
-                <Text textAlign='center'>
-                  ยินดีต้อนรับกลับ!{' '}
-                  {user?.displayName || user?.email || user?.uid}
-                </Text>
+                <Flex
+                  alignItems='center'
+                  justifyContent='center'
+                  flexWrap='wrap'
+                  gap={2}
+                  textAlign='center'
+                >
+                  <Text>ยินดีต้อนรับ!</Text>
+                  <Tooltip label='แก้ไขชื่อ'>
+                    <Button
+                      rightIcon={<FaPen />}
+                      onClick={onOpenUpdateNameModal}
+                    >
+                      {displayName}
+                    </Button>
+                  </Tooltip>
+                </Flex>
                 <Stack
                   pt={4}
                   width='full'
@@ -70,6 +106,10 @@ const HomePage: FC = () => {
         </Center>
       </Container>
       <AuthModal isOpen={isOpenAuthModal} onClose={onCloseAuthModal} />
+      <UpdateNameModal
+        isOpen={isOpenUpdateNameModal}
+        onClose={onCloseUpdateNameModal}
+      />
     </>
   )
 }
