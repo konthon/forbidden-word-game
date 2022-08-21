@@ -37,13 +37,6 @@ const AUTH_TYPES = [
   },
 ]
 
-const MIN_LENGTH_PASSWORD = 6
-
-interface IPasswordAuthFields {
-  email: string
-  password: string
-}
-
 interface IProps extends Omit<ModalProps, 'children'> {}
 
 const AuthModal: FC<IProps> = (props) => {
