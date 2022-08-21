@@ -17,7 +17,7 @@ import type { FC } from 'react'
 import { signOut } from 'services/Firebase/authentication'
 
 const HomePage: FC = () => {
-  const { data: user, isLoading } = useAuthState()
+  const { user, isLoading } = useAuthState()
   const {
     isOpen: isOpenAuthModal,
     onOpen: onOpenAuthModal,

@@ -13,7 +13,6 @@ import {
   ModalHeader,
   ModalOverlay,
   Stack,
-  useToast,
 } from '@chakra-ui/react'
 import { isEmpty } from 'lodash'
 import { useForm } from 'react-hook-form'
@@ -23,6 +22,7 @@ import type { FC } from 'react'
 import type { SubmitHandler } from 'react-hook-form'
 
 import { sendResetPasswordToEmail } from 'services/Firebase/authentication'
+import { useFeedback } from 'hooks/useFeedback'
 
 interface IResetPasswordFields {
   email: string
@@ -32,7 +32,7 @@ interface IProps extends Omit<ModalProps, 'children'> {}
 
 const ResetPasswordModal: FC<IProps> = (props) => {
   const { isOpen, onClose } = props
-  const toast = useToast()
+  const { success, error } = useFeedback()
 
   const {
     register,
@@ -44,19 +44,14 @@ const ResetPasswordModal: FC<IProps> = (props) => {
     const { email } = data
     try {
       await sendResetPasswordToEmail(email)
-      toast({
-        status: 'success',
+      success({
         title: 'ส่งอีเมลเรียบร้อยแล้ว',
         description: `กรุณาตรวจสอบอีเมล: ${email}`,
       })
       onClose()
       reset()
-    } catch (error: any) {
-      toast({
-        status: 'error',
-        title: 'พบปัญหาการส่งอีเมลตั้งค่ารหัสผ่านใหม่',
-        description: error.message,
-      })
+    } catch (err) {
+      error(err)
     }
   }
 
