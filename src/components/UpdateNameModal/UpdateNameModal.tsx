@@ -37,29 +37,33 @@ const UpdateNameModal: FC<IProps> = (props) => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
-    setValue,
+    formState: { errors, isDirty },
+    reset,
   } = useForm<IUpdateNameField>()
+
+  const handleClose = () => {
+    onClose()
+    reset({ displayName: user?.displayName || '' })
+  }
+
   const onSubmit: SubmitHandler<IUpdateNameField> = async (data) => {
     setIsLoading(true)
     const { displayName } = data
     try {
       await updateUserProfile({ displayName })
       success({ title: 'บันทึกชื่อแล้ว' })
-      onClose()
+      handleClose()
     } catch (err) {
       error(err)
     }
   }
 
   useEffect(() => {
-    if (user && !isEmpty(user) && user.displayName) {
-      setValue('displayName', user.displayName)
-    }
+    reset({ displayName: user?.displayName || '' })
   }, [user])
 
   return (
-    <Modal onClose={onClose} {...restProps}>
+    <Modal onClose={handleClose} {...restProps}>
       <ModalOverlay />
       <ModalContent>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -79,12 +83,13 @@ const UpdateNameModal: FC<IProps> = (props) => {
           </ModalBody>
           <ModalFooter>
             <Stack direction='row'>
-              <Button onClick={onClose} isDisabled={isLoading}>
+              <Button onClick={handleClose} isDisabled={isLoading}>
                 ยกเลิก
               </Button>
               <Button
-                colorScheme='green'
                 type='submit'
+                colorScheme='green'
+                isDisabled={!isDirty}
                 onClick={handleSubmit(onSubmit)}
                 isLoading={isLoading}
               >

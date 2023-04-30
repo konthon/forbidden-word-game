@@ -1,9 +1,10 @@
+import { FirebaseError } from 'firebase/app'
 import { onAuthStateChanged } from 'firebase/auth'
-import { firebaseAuth } from 'libs/Firebase'
 import { useEffect, useState } from 'react'
 
 import type { User } from 'firebase/auth'
-import { FirebaseError } from 'firebase/app'
+
+import { firebaseAuth } from 'libs/Firebase'
 
 interface IAuthStateOptions {
   // eslint-disable-next-line no-unused-vars

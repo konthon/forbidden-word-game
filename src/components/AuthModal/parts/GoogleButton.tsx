@@ -6,18 +6,17 @@ import { FaGoogle } from 'react-icons/fa'
 import type { FC } from 'react'
 
 import { useFeedback } from 'hooks/useFeedback'
-import { signInWithProvider } from 'services/Firebase/authentication'
+import { signInRedirectProvider } from 'services/Firebase/authentication'
 
 const googleProvider = new GoogleAuthProvider()
 
 const GoogleButton: FC = () => {
-  const { success, error } = useFeedback()
+  const { error } = useFeedback()
   const [isLoading, setIsLoading] = useState(false)
   const onClick = async () => {
     setIsLoading(true)
     try {
-      await signInWithProvider(googleProvider)
-      success({ title: 'เข้าสู่ระบบสำเร็จ' })
+      await signInRedirectProvider(googleProvider)
     } catch (err) {
       error(err)
     }

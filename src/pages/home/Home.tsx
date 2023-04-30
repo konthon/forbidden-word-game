@@ -17,9 +17,10 @@ import { FaPen } from 'react-icons/fa'
 import type { FC } from 'react'
 
 import { AuthModal } from 'components/AuthModal'
-import { useAuthState } from 'hooks/useAuthState'
-import { signOut } from 'services/Firebase/authentication'
 import { UpdateNameModal } from 'components/UpdateNameModal'
+import { useAuthState } from 'hooks/useAuthState'
+import { useRedirectAuth } from 'hooks/useRedirectAuth'
+import { signInAnonymously, signOut } from 'services/Firebase/authentication'
 
 const HomePage: FC = () => {
   const { user, isLoading } = useAuthState()
@@ -37,14 +38,16 @@ const HomePage: FC = () => {
   } = useDisclosure()
 
   const displayName = useMemo(() => {
-    const MAX_LENGTH_NAME = 20
+    const NAME_MAX_LENGTH = 20
     if (user && !isEmpty(user)) {
-      const result = user.displayName || user.email || user.uid
-      const ellipsis = result.length > MAX_LENGTH_NAME ? '...' : ''
-      return `${result.slice(0, MAX_LENGTH_NAME)}${ellipsis}`
+      const name = user.displayName || user.email || user.uid
+      const ellipsis = name.length > NAME_MAX_LENGTH ? '...' : ''
+      return `${name.slice(0, NAME_MAX_LENGTH)}${ellipsis}`
     }
     return 'User'
   }, [user, user?.displayName, user?.email, user?.uid])
+
+  useRedirectAuth()
 
   return (
     <>
@@ -61,7 +64,12 @@ const HomePage: FC = () => {
                 >
                   เข้าสู่ระบบ
                 </Button>
-                <Button isLoading={isLoading}>ไม่ระบุตัวตน</Button>
+                <Button
+                  isLoading={isLoading}
+                  onClick={() => signInAnonymously()}
+                >
+                  ไม่ระบุตัวตน
+                </Button>
               </Stack>
             )}
             {!isEmpty(user) && !isLoading && (
