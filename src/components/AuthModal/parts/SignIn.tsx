@@ -3,12 +3,17 @@ import {
   Button,
   FormControl,
   FormErrorMessage,
+  IconButton,
   Input,
+  InputGroup,
+  InputRightElement,
   Stack,
+  useBoolean,
   useDisclosure,
 } from '@chakra-ui/react'
 import { isEmpty } from 'lodash'
 import { useForm } from 'react-hook-form'
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
 
 import type { FC } from 'react'
 import type { SubmitHandler } from 'react-hook-form'
@@ -16,7 +21,7 @@ import type { SubmitHandler } from 'react-hook-form'
 import { useFeedback } from 'hooks/useFeedback'
 import { signInWithEmail } from 'services/Firebase/authentication'
 
-import { ResetPasswordModal } from '../ResetPasswordModal'
+import ResetPasswordModal from './ResetPasswordModal'
 
 interface ISignInAuthFields {
   email: string
@@ -30,6 +35,8 @@ interface IProps {
 const SignInPart: FC<IProps> = (props) => {
   const { onClose } = props
   const { success, error, isLoading, setIsLoading } = useFeedback()
+
+  const [showPassword, setShowPassword] = useBoolean()
 
   const {
     isOpen: isOpenResetPassword,
@@ -72,14 +79,24 @@ const SignInPart: FC<IProps> = (props) => {
           <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
         </FormControl>
         <FormControl isRequired isInvalid={!isEmpty(errors.password)}>
-          <Input
-            type='password'
-            autoComplete='current-password'
-            placeholder='กรอกรหัสผ่าน'
-            {...register('password', {
-              required: { value: true, message: 'กรุณากรอกรหัสผ่าน' },
-            })}
-          />
+          <InputGroup>
+            <Input
+              type={showPassword ? 'text' : 'password'}
+              autoComplete='current-password'
+              placeholder='กรอกรหัสผ่าน'
+              {...register('password', {
+                required: { value: true, message: 'กรุณากรอกรหัสผ่าน' },
+              })}
+            />
+            <InputRightElement>
+              <IconButton
+                size='sm'
+                aria-label='show/hide password'
+                icon={showPassword ? <FaEyeSlash /> : <FaEye />}
+                onClick={() => setShowPassword.toggle()}
+              />
+            </InputRightElement>
+          </InputGroup>
           <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
         </FormControl>
         <Button

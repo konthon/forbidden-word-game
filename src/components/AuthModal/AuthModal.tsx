@@ -21,10 +21,11 @@ import type { FC } from 'react'
 
 import { useAuthState } from 'hooks/useAuthState'
 
+import FacebookButton from './parts/FacebookButton'
+import GoogleButton from './parts/GoogleButton'
+import SignIn from './parts/SignIn'
+import SignUp from './parts/SignUp'
 import { EAuthType } from './type'
-import { SignIn } from './Parts/SignIn'
-import { FacebookButton, GoogleButton } from './Parts/SocialButtons'
-import { SignUp } from './Parts/SignUp'
 
 const AUTH_TYPES = [
   {
