@@ -9,6 +9,7 @@ import {
   Divider,
   Flex,
   Tooltip,
+  VStack,
 } from '@chakra-ui/react'
 import { useMemo } from 'react'
 import { isEmpty } from 'lodash'
@@ -17,10 +18,11 @@ import { FaPen } from 'react-icons/fa'
 import type { FC } from 'react'
 
 import { AuthModal } from 'components/AuthModal'
+import { SignOutButton } from 'components/SignOutButton'
 import { UpdateNameModal } from 'components/UpdateNameModal'
 import { useAuthState } from 'hooks/useAuthState'
 import { useRedirectAuth } from 'hooks/useRedirectAuth'
-import { signInAnonymously, signOut } from 'services/Firebase/authentication'
+import { signInAnonymously } from 'services/Firebase/authentication'
 
 const HomePage: FC = () => {
   const { user, isLoading } = useAuthState()
@@ -91,23 +93,16 @@ const HomePage: FC = () => {
                     </Button>
                   </Tooltip>
                 </Flex>
-                <Stack
+                <VStack
                   pt={4}
                   width='full'
-                  alignItems='center'
                   sx={{ button: { width: 'min(200px, 100%)' } }}
                 >
                   <Button colorScheme='blue'>เริ่มเกมใหม่</Button>
                   <Button>ใส่รหัสห้อง</Button>
                   <Divider />
-                  <Button
-                    colorScheme='red'
-                    onClick={() => signOut()}
-                    isLoading={isLoading}
-                  >
-                    ออกจากระบบ
-                  </Button>
-                </Stack>
+                  <SignOutButton />
+                </VStack>
               </>
             )}
           </Stack>

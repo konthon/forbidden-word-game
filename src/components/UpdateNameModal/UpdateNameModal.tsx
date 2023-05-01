@@ -13,49 +13,52 @@ import {
   Stack,
 } from '@chakra-ui/react'
 import { isEmpty } from 'lodash'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
 import type { ModalProps } from '@chakra-ui/react'
-import { FC, useEffect } from 'react'
+import type { FC } from 'react'
 import type { SubmitHandler } from 'react-hook-form'
 
 import { useAuthState } from 'hooks/useAuthState'
 import { useFeedback } from 'hooks/useFeedback'
 import { updateUserProfile } from 'services/Firebase/authentication'
+import { useMutation } from '@tanstack/react-query'
 
-interface IUpdateNameField {
+interface UpdateNameFields {
   displayName: string
 }
 
-interface IProps extends Omit<ModalProps, 'children'> {}
+interface Props extends Omit<ModalProps, 'children'> {}
 
-const UpdateNameModal: FC<IProps> = (props) => {
+const UpdateNameModal: FC<Props> = (props) => {
   const { onClose, ...restProps } = props
+
   const { user } = useAuthState()
-  const { success, error, isLoading, setIsLoading } = useFeedback()
+  const { success } = useFeedback()
 
   const {
     register,
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-  } = useForm<IUpdateNameField>()
+  } = useForm<UpdateNameFields>()
 
   const handleClose = () => {
     onClose()
     reset({ displayName: user?.displayName || '' })
   }
 
-  const onSubmit: SubmitHandler<IUpdateNameField> = async (data) => {
-    setIsLoading(true)
-    const { displayName } = data
-    try {
-      await updateUserProfile({ displayName })
+  const { mutate, isLoading } = useMutation({
+    mutationFn: updateUserProfile,
+    onSuccess: () => {
       success({ title: 'บันทึกชื่อแล้ว' })
       handleClose()
-    } catch (err) {
-      error(err)
-    }
+    },
+  })
+
+  const onSubmit: SubmitHandler<UpdateNameFields> = ({ displayName }) => {
+    mutate({ displayName })
   }
 
   useEffect(() => {

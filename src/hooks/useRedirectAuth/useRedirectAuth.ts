@@ -1,8 +1,9 @@
-import { useEffect } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import { ProviderId } from 'firebase/auth'
+import { useEffect, useRef } from 'react'
 
 import { useFeedback } from 'hooks/useFeedback'
 import { getRedirectProviderResult } from 'services/Firebase/authentication'
-import { ProviderId } from 'firebase/auth'
 
 type ProviderIdKey = keyof typeof ProviderId
 type ProviderIdValue = (typeof ProviderId)[ProviderIdKey]
@@ -27,29 +28,35 @@ const getProviderName = (providerId: string | null) => {
 }
 
 const useRedirectAuth = () => {
-  const { success, error } = useFeedback()
+  const { success } = useFeedback()
+  const isMounted = useRef(false)
+
+  const { mutate } = useMutation({
+    mutationFn: getRedirectProviderResult,
+    onSuccess: (userCredential) => {
+      if (userCredential) {
+        switch (userCredential.operationType) {
+          case 'signIn':
+            success({
+              title: `เข้าสู่ระบบด้วย ${getProviderName(
+                userCredential.providerId
+              )} สำเร็จแล้ว`,
+            })
+            break
+          default:
+            break
+        }
+      }
+    },
+  })
 
   useEffect(() => {
-    getRedirectProviderResult()
-      .then((result) => {
-        if (result) {
-          switch (result.operationType) {
-            case 'signIn':
-              success({
-                title: `เข้าสู่ระบบด้วย ${getProviderName(
-                  result.providerId
-                )} สำเร็จแล้ว`,
-              })
-              break
-
-            default:
-              break
-          }
-        }
-      })
-      .catch((err) => {
-        error(err)
-      })
+    if (!isMounted.current) {
+      mutate()
+    }
+    return () => {
+      isMounted.current = true
+    }
   }, [])
 }
 

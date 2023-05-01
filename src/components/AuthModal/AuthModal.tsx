@@ -25,15 +25,15 @@ import FacebookButton from './parts/FacebookButton'
 import GoogleButton from './parts/GoogleButton'
 import SignIn from './parts/SignIn'
 import SignUp from './parts/SignUp'
-import { EAuthType } from './type'
+import { AuthType } from './type'
 
 const AUTH_TYPES = [
   {
-    type: EAuthType.sign_in,
+    type: AuthType.sign_in,
     name: 'เข้าสู่ระบบ',
   },
   {
-    type: EAuthType.sign_up,
+    type: AuthType.sign_up,
     name: 'ลงทะเบียน',
   },
 ]
@@ -44,7 +44,7 @@ const AuthModal: FC<IProps> = (props) => {
   const { onClose } = props
   const { user } = useAuthState()
 
-  const [authType, setAuthType] = useState(EAuthType.sign_in)
+  const [authType, setAuthType] = useState(AuthType.sign_in)
 
   useEffect(() => {
     if (!isEmpty(user)) {
@@ -68,7 +68,7 @@ const AuthModal: FC<IProps> = (props) => {
         <ModalCloseButton />
         <ModalBody>
           <Stack>
-            {authType === EAuthType.sign_up ? (
+            {authType === AuthType.sign_up ? (
               <SignUp onClose={onClose} />
             ) : (
               <SignIn onClose={onClose} />

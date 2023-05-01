@@ -11,6 +11,7 @@ import {
   useBoolean,
   useDisclosure,
 } from '@chakra-ui/react'
+import { useMutation } from '@tanstack/react-query'
 import { isEmpty } from 'lodash'
 import { useForm } from 'react-hook-form'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
@@ -23,18 +24,18 @@ import { signInWithEmail } from 'services/Firebase/authentication'
 
 import ResetPasswordModal from './ResetPasswordModal'
 
-interface ISignInAuthFields {
+interface SignInFields {
   email: string
   password: string
 }
 
-interface IProps {
+interface Props {
   onClose?: () => void
 }
 
-const SignInPart: FC<IProps> = (props) => {
+const SignInPart: FC<Props> = (props) => {
   const { onClose } = props
-  const { success, error, isLoading, setIsLoading } = useFeedback()
+  const { success } = useFeedback()
 
   const [showPassword, setShowPassword] = useBoolean()
 
@@ -49,19 +50,19 @@ const SignInPart: FC<IProps> = (props) => {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<ISignInAuthFields>()
+  } = useForm<SignInFields>()
 
-  const onSubmit: SubmitHandler<ISignInAuthFields> = async (data) => {
-    setIsLoading(true)
-    const { email, password } = data
-    try {
-      await signInWithEmail(email, password)
+  const { mutate, isLoading } = useMutation({
+    mutationFn: signInWithEmail,
+    onSuccess: () => {
       success({ title: 'เข้าสู่ระบบสำเร็จ' })
       onClose?.()
       reset()
-    } catch (err) {
-      error(err)
-    }
+    },
+  })
+
+  const onSubmit: SubmitHandler<SignInFields> = ({ email, password }) => {
+    mutate({ email, password })
   }
 
   return (
@@ -99,12 +100,7 @@ const SignInPart: FC<IProps> = (props) => {
           </InputGroup>
           <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
         </FormControl>
-        <Button
-          colorScheme='blue'
-          type='submit'
-          onClick={handleSubmit(onSubmit)}
-          isLoading={isLoading}
-        >
+        <Button type='submit' colorScheme='blue' isLoading={isLoading}>
           เข้าสู่ระบบ
         </Button>
         <Box alignSelf='center' py={2}>

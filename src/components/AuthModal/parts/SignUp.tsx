@@ -7,8 +7,9 @@ import {
   InputGroup,
   InputRightElement,
   Stack,
-  useDisclosure,
+  useBoolean,
 } from '@chakra-ui/react'
+import { useMutation } from '@tanstack/react-query'
 import { isEmpty } from 'lodash'
 import { useForm } from 'react-hook-form'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
@@ -19,23 +20,23 @@ import type { SubmitHandler } from 'react-hook-form'
 import { useFeedback } from 'hooks/useFeedback'
 import { signUpWithEmail } from 'services/Firebase/authentication'
 
-interface ISignUpAuthFields {
+interface SignUpFields {
   email: string
   password: string
   confirmPassword: string
 }
 
-interface IProps {
+interface Props {
   onClose?: () => void
 }
 
 const MIN_LENGTH_PASSWORD = 6
 
-const SignUpPart: FC<IProps> = (props) => {
+const SignUpPart: FC<Props> = (props) => {
   const { onClose } = props
-  const { isOpen: isShowPassword, onToggle: onToggleShowPassword } =
-    useDisclosure()
-  const { success, error, isLoading, setIsLoading } = useFeedback()
+
+  const { success } = useFeedback()
+  const [showPassword, setShowPassword] = useBoolean(false)
 
   const {
     register,
@@ -43,18 +44,19 @@ const SignUpPart: FC<IProps> = (props) => {
     formState: { errors },
     watch,
     reset,
-  } = useForm<ISignUpAuthFields>()
-  const onSubmit: SubmitHandler<ISignUpAuthFields> = async (data) => {
-    setIsLoading(true)
-    const { email, password } = data
-    try {
-      await signUpWithEmail(email, password)
+  } = useForm<SignUpFields>()
+
+  const { mutate, isLoading } = useMutation({
+    mutationFn: signUpWithEmail,
+    onSuccess: () => {
       success({ title: 'ลงทะเบียนสำเร็จ' })
       onClose?.()
       reset()
-    } catch (err) {
-      error(err)
-    }
+    },
+  })
+
+  const onSubmit: SubmitHandler<SignUpFields> = ({ email, password }) => {
+    mutate({ email, password })
   }
 
   return (
@@ -77,7 +79,7 @@ const SignUpPart: FC<IProps> = (props) => {
       <FormControl isRequired isInvalid={!isEmpty(errors.password)}>
         <InputGroup>
           <Input
-            type={isShowPassword ? 'text' : 'password'}
+            type={showPassword ? 'text' : 'password'}
             autoComplete='new-password'
             placeholder='กรอกรหัสผ่าน'
             {...register('password', {
@@ -91,9 +93,9 @@ const SignUpPart: FC<IProps> = (props) => {
           <InputRightElement>
             <IconButton
               aria-label='แสดง/ซ่อนรหัสผ่าน'
-              icon={isShowPassword ? <FaEye /> : <FaEyeSlash />}
+              icon={showPassword ? <FaEye /> : <FaEyeSlash />}
               size='sm'
-              onClick={onToggleShowPassword}
+              onClick={() => setShowPassword.toggle()}
             />
           </InputRightElement>
         </InputGroup>
@@ -102,7 +104,7 @@ const SignUpPart: FC<IProps> = (props) => {
       <FormControl isRequired isInvalid={!isEmpty(errors.confirmPassword)}>
         <InputGroup>
           <Input
-            type={isShowPassword ? 'text' : 'password'}
+            type={showPassword ? 'text' : 'password'}
             autoComplete='new-password'
             placeholder='กรอกรหัสผ่านอีกครั้ง'
             {...register('confirmPassword', {
@@ -123,20 +125,15 @@ const SignUpPart: FC<IProps> = (props) => {
           <InputRightElement>
             <IconButton
               aria-label='แสดง/ซ่อนรหัสผ่าน'
-              icon={isShowPassword ? <FaEye /> : <FaEyeSlash />}
+              icon={showPassword ? <FaEye /> : <FaEyeSlash />}
               size='sm'
-              onClick={onToggleShowPassword}
+              onClick={() => setShowPassword.toggle()}
             />
           </InputRightElement>
         </InputGroup>
         <FormErrorMessage>{errors.confirmPassword?.message}</FormErrorMessage>
       </FormControl>
-      <Button
-        colorScheme='blue'
-        type='submit'
-        onClick={handleSubmit(onSubmit)}
-        isLoading={isLoading}
-      >
+      <Button type='submit' colorScheme='blue' isLoading={isLoading}>
         ลงทะเบียน
       </Button>
     </Stack>

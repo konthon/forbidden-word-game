@@ -14,11 +14,16 @@ import type { AuthProvider, User } from 'firebase/auth'
 
 import { firebaseAuth } from 'libs/Firebase'
 
-export const signInWithEmail = (email: string, password: string) =>
+interface EmailParams {
+  email: string
+  password: string
+}
+
+export const signInWithEmail = ({ email, password }: EmailParams) =>
   signInWithEmailAndPassword(firebaseAuth, email, password)
 export const signInAnonymously = () => _signInAnonymously(firebaseAuth)
 
-export const signUpWithEmail = (email: string, password: string) =>
+export const signUpWithEmail = ({ email, password }: EmailParams) =>
   createUserWithEmailAndPassword(firebaseAuth, email, password)
 
 export const signOut = () => _signOut(firebaseAuth)

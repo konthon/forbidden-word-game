@@ -14,6 +14,7 @@ import {
   ModalOverlay,
   Stack,
 } from '@chakra-ui/react'
+import { useMutation } from '@tanstack/react-query'
 import { isEmpty } from 'lodash'
 import { useForm } from 'react-hook-form'
 
@@ -24,35 +25,37 @@ import type { SubmitHandler } from 'react-hook-form'
 import { sendResetPasswordToEmail } from 'services/Firebase/authentication'
 import { useFeedback } from 'hooks/useFeedback'
 
-interface IResetPasswordFields {
+interface ResetPasswordFields {
   email: string
 }
 
-interface IProps extends Omit<ModalProps, 'children'> {}
+interface Props extends Omit<ModalProps, 'children'> {}
 
-const ResetPasswordModal: FC<IProps> = (props) => {
+const ResetPasswordModal: FC<Props> = (props) => {
   const { isOpen, onClose } = props
-  const { success, error } = useFeedback()
+  const { success } = useFeedback()
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<IResetPasswordFields>()
-  const onSubmit: SubmitHandler<IResetPasswordFields> = async (data) => {
-    const { email } = data
-    try {
-      await sendResetPasswordToEmail(email)
+  } = useForm<ResetPasswordFields>()
+
+  const { mutate, isLoading } = useMutation({
+    mutationFn: sendResetPasswordToEmail,
+    onSuccess: (_, email) => {
       success({
         title: 'ส่งอีเมลเรียบร้อยแล้ว',
         description: `กรุณาตรวจสอบอีเมล: ${email}`,
       })
       onClose()
       reset()
-    } catch (err) {
-      error(err)
-    }
+    },
+  })
+
+  const onSubmit: SubmitHandler<ResetPasswordFields> = ({ email }) => {
+    mutate(email)
   }
 
   return (
@@ -89,14 +92,11 @@ const ResetPasswordModal: FC<IProps> = (props) => {
                   reset()
                   onClose()
                 }}
+                isDisabled={isLoading}
               >
                 ยกเลิก
               </Button>
-              <Button
-                type='submit'
-                colorScheme='blue'
-                onClick={handleSubmit(onSubmit)}
-              >
+              <Button type='submit' colorScheme='blue' isLoading={isLoading}>
                 ส่ง
               </Button>
             </Stack>

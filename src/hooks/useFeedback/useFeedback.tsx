@@ -1,13 +1,11 @@
 import { useToast } from '@chakra-ui/react'
 import { FirebaseError } from 'firebase/app'
-import { useState } from 'react'
 
 import type { UseToastOptions } from '@chakra-ui/react'
 
 import { ERROR_MESSAGES } from 'config/errorMessages'
 
 const useFeedback = () => {
-  const [isLoading, setIsLoading] = useState(false)
   const toast = useToast({ isClosable: true })
 
   const success = (toastOptions?: UseToastOptions) => {
@@ -16,7 +14,6 @@ const useFeedback = () => {
       title: 'สำเร็จ',
       ...toastOptions,
     })
-    setIsLoading(false)
   }
 
   const error = (err: unknown, toastOptions?: UseToastOptions) => {
@@ -42,10 +39,9 @@ const useFeedback = () => {
     } else {
       toast({ status: 'error', title: 'พบปัญหา', ...toastOptions })
     }
-    setIsLoading(false)
   }
 
-  return { success, error, toast, isLoading, setIsLoading }
+  return { success, error, toast }
 }
 
 export default useFeedback
